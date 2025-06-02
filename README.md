@@ -10,4 +10,4 @@ to install and setup initial configuration, make them synch and enabling autosta
 <hr>
 
  ```pwsh> .\makestyle delete```
- to delete it's previous downloaded app 
+ to delete previously downloaded app 
