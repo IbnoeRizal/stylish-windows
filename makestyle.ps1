@@ -11,7 +11,7 @@ $daftar_app = @(
 
     @{
         name      = "POWERSHELL"
-        id        = "Microsoft.Powershell"
+        id        = "Microsoft.PowerShell"
         installed = $false
         deskripsi = "powershell terbaru modern"
     }
@@ -46,7 +46,7 @@ $daftar_app = @(
 
     @{
         name      = "NEOVIM"; 
-        id        = "NEOVIM.Neovim"; 
+        id        = "Neovim.Neovim"; 
         installed = $false; 
         deskripsi = "text editor GUI shell" 
     }
@@ -109,7 +109,7 @@ function install {
         }
 
         write-progress -Activity "installing" -Status "$($app.name) deskripsi: $($app.deskripsi)" -PercentComplete ($loader * 100 / $daftar_app.Count)
-        winget install --id $app.id -e
+        winget install --id $app.id -e 
 
         $loader ++
     }
@@ -203,11 +203,11 @@ function konfig {
 
 
 function fontdownload {
-    #yasb membutuhkan font jetbrains 
-    #posh membutuhkan font caskaydiacove
     param (
         [int]$no
     )
+    #yasb membutuhkan font jetbrains 
+    #posh membutuhkan font caskaydiacove
 
     $fontUrls = @(
         "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip", 
