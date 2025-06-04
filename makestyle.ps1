@@ -108,7 +108,7 @@ function install {
             }
         }
 
-        write-progress -Activity "installing" -Status "$($app.name) deskripsi: $($app.deskripsi)" -PercentComplete ($loader * 100 / $daftar_app.Count)
+        write-progress -Id 1 -Activity "installing" -Status "$($app.name) deskripsi: $($app.deskripsi)" -PercentComplete ($loader * 100 / $daftar_app.Count)
         winget install --id $app.id -e 
 
         $loader ++
@@ -243,15 +243,15 @@ function fontdownload {
     Write-Host "Menginstal font..."
     $fontFiles = Get-ChildItem -Path $fontExtractPath -Filter "*.ttf" -Recurse
 
-    $loader ++
+    $load ++
     foreach ($fontFile in $fontFiles) {
-        Write-Progress -Activity "Menginstal" -Status "$($fontFile.Name)" -PercentComplete ($loader * 100 / $fontFiles.Count)
+        Write-Progress -Id 2 -Activity "Menginstal" -Status "$($fontFile.Name)" -PercentComplete ($load * 100 / $fontFiles.Count)
         Copy-Item -Path $fontFile.FullName -Destination $fontsFolder
-        $loader ++
+        $load ++
     }
-    $loader = 0
+    $load = 0
     
-    Write-Host "$($fontName[$no]) Nerd Font berhasil diinstal!" -ForegroundColor Blue
+    Write-Host "$($fontName[$no]) Nerd Font berhasil diinstal!" -ForegroundColor Blue 
 }
 
 #this delete function won't delete fonts wich it previously downloaded
