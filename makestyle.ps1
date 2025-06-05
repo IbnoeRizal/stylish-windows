@@ -252,7 +252,7 @@ function fontdownload {
     Write-Host "Menginstal font..."
     $fontFiles = Get-ChildItem -Path $fontExtractPath -Filter "*.ttf" -Recurse
 
-    $load ++
+    $load = 0
     foreach ($fontFile in $fontFiles) {
         Write-Progress -Id 2 -Activity "Menginstal" -Status "$($fontFile.Name)" -PercentComplete ($load * 100 / $fontFiles.Count)
         Copy-Item -Path $fontFile.FullName -Destination $fontsFolder
