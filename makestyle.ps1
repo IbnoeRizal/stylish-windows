@@ -81,7 +81,7 @@ function install {
         }
         
         if ($app.name -eq "KOMOREBI" -or $app.name -eq "NEOVIM" ) {
-            write-host "apakah anda ingin menginstall $($app.name) (opsional) \n deskripsi: $($app.deskripsi)"
+            write-host "apakah anda ingin menginstall $($app.name) (opsional) `n deskripsi: $($app.deskripsi)"
             $jawab = Read-Host "(y/n)" 
 
             if ( $jawab -notmatch "y|Y") {
@@ -89,9 +89,7 @@ function install {
                 continue
             }
 
-        }
-
-        elseif ($app.name -eq "WHKD") {
+        }elseif ($app.name -eq "WHKD") {
             $komorebi = $daftar_app | Where-Object { $_.name -eq "KOMOREBI" }
             if (-not $komorebi.installed) {
                 $loader ++
@@ -110,6 +108,7 @@ function install {
 
         write-progress -Id 1 -Activity "installing" -Status "$($app.name) deskripsi: $($app.deskripsi)" -PercentComplete ($loader * 100 / $daftar_app.Count)
         winget install --id $app.id -e 
+        $app.installed = $true
 
         $loader ++
     }
@@ -142,31 +141,36 @@ function konfig {
                     komorebic start --whkd
                 }
                 else {
+                    komorebic enable-autostart --whkd --bar
                     komorebic start --whkd --bar
-                    $path = "$env:USERPROFILE\komorebi.bar.json"
+                }
 
-                    #setup bar
+                #setup bar
+                $path = "$env:USERPROFILE\komorebi.bar.json"
+                if(test-path -path $path){
                     $jsonst = get-content -Path $path | convertfrom-json
                     
-                    $jsonst.left_widgets.hide_empty_workspaces = $true
-                    $jsonst.right_widgets.Storage.enable = $false
-                    $jsonst.right_widgets.Network.show_total_data_transmitted = $false
-                    $jsonst.right_widgets.Network.show_network_activity = $false
+                    $jsonst.left_widgets[0].Komorebi.workspaces.hide_empty_workspaces = $true
+                    $jsonst.right_widgets[2].Storage.enable = $false
+                    $jsonst.right_widgets[4].Network.show_total_data_transmitted = $false
+                    $jsonst.right_widgets[4].Network.show_network_activity = $false
                     
                     $jsonst | ConvertTo-Json -Depth 10 | set-content -Path $path
-                    
-                    komorebic enable-autostart --whkd --bar
                 }
 
                 #configure komorebi tiling windws behavior
                 $path = "$env:USERPROFILE\komorebi.json"
-                $jsonst = get-content -Path $path | convertfrom-json
-                
-                $jsonst.default_workspace_padding = 10
-                $jsonst.default_container_padding = 4
-                $jsonst.border = $false
-                
-                $jsonst | ConvertTo-Json -Depth 10 | Set-Content -Path $path
+                if (Test-Path -Path $path){
+                    $jsonst = get-content -Path $path | convertfrom-json
+                    
+                    $jsonst.default_workspace_padding = 10
+                    $jsonst.default_container_padding = 4
+                    $jsonst.border = $false
+                    $jsonst.border_width = 8
+                    $jsonst.border_offset = -1
+                    
+                    $jsonst | ConvertTo-Json -Depth 10 | Set-Content -Path $path
+                }
 
                     
             }
@@ -175,18 +179,23 @@ function konfig {
                 Add-Content -Path $PROFILE -Value 'oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\jandedobbeleer.omp.json" | Invoke-Expression'
             }
             "TERMINAL" {
-                $path = "$env:LOCALAPPDATA\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+                $path = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
 
                 $datajson = get-content -Path $path | convertfrom-json
                 
                 #profile default setup
-                $datajson.profiles.defaults.font.builtinGlyph = $false
-                $datajson.profiles.defaults.font.face = "CaskaydiaCove Nerd Font"
-                $datajson.profiles.defaults.opacity = 45
-                $datajson.profiles.defaults.scrollbarState = "hidden"
-                $datajson.profiles.defaults.useAcrylic = $true
+                 $datajson.profiles.defaults = @{
+                    adjustIndistinguishableColors = "indexed"
+                    backgroundImage = $null
+                    font = @{
+                        face = "CaskaydiaCove Nerd Font"
+                        builtinGlyph = $false  
+                    }
+                    opacity = 45
+                    scrollbarState = "hidden"
+                    useAcrylic = $true
+                }
                 
-                $datajson.profiles.list.guid = "{574e775e-4f2a-5b96-ac1e-a2962a402336}"
                 $datajson.useAcrylicInTabRow = $true
 
                 $datajson | ConvertTo-Json -Depth 10 | Set-Content -Path $path 
